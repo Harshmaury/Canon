@@ -1,0 +1,14 @@
+name: platform
+id: platform
+type: library
+language: go
+version: 0.1.0
+capabilities:
+  - shared-types
+  - event-constants
+  - identity-constants
+  - descriptor-schema
+depends_on: []
+runtime:
+  provider: process
+  port: 0
