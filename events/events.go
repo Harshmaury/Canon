@@ -54,3 +54,11 @@ const (
 	LevelWarn  LevelType = "warn"  // degraded but not failing
 	LevelError LevelType = "error" // failure requiring attention
 )
+
+// CLI execution events — emitted by the engx CLI plan executor (ADR-043).
+const (
+	EventPlanStep EventType = "PLAN_STEP"
+)
+
+// ComponentEngx identifies the engx CLI as the event source.
+const ComponentEngx ComponentType = "engx"
