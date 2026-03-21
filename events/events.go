@@ -44,3 +44,13 @@ const (
 	OutcomeDeferred OutcomeType = "deferred"
 	OutcomeInfo     OutcomeType = "" // informational — no actionable result
 )
+
+// LevelType is the severity level of a platform event (ADR-037).
+// Import from Canon — never hardcode "info"/"warn"/"error" in any service.
+type LevelType = string
+
+const (
+	LevelInfo  LevelType = "info"  // normal operation
+	LevelWarn  LevelType = "warn"  // degraded but not failing
+	LevelError LevelType = "error" // failure requiring attention
+)
