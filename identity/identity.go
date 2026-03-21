@@ -3,10 +3,11 @@
 // import these constants — never hardcode header strings locally.
 //
 // ADR-016: types and constants only. No logic, no HTTP clients.
+// ADR-042: IdentityTokenHeader, GateService, DefaultGateAddr added.
 package identity
 
 // HTTP header constants for inter-service communication.
-// Import these — never write "X-Service-Token" or "X-Trace-ID" as literals.
+// Import these — never write header strings as literals.
 const (
 	// TraceIDHeader is the HTTP header for distributed trace propagation.
 	// Set by Nexus, Atlas, and Forge TraceID middleware (ADR-015 / Phase 15-16).
@@ -14,7 +15,14 @@ const (
 
 	// ServiceTokenHeader is the HTTP header for inter-service authentication.
 	// Required on all non-health inter-service calls (ADR-008).
+	// Proves the caller is a known platform service — not an actor identity.
 	ServiceTokenHeader = "X-Service-Token"
+
+	// IdentityTokenHeader carries the Gate-issued actor identity token (ADR-042).
+	// Present on requests from human actors, agents, and CI pipelines.
+	// Independent of ServiceTokenHeader — both may be present simultaneously.
+	// Never required on GET /health.
+	IdentityTokenHeader = "X-Identity-Token"
 )
 
 // Platform service name constants.
@@ -28,6 +36,7 @@ const (
 	ServiceGuardian  = "guardian"
 	ServiceObserver  = "observer"
 	ServiceSentinel  = "sentinel"
+	ServiceGate      = "gate"
 )
 
 // Platform service default addresses.
@@ -41,4 +50,5 @@ const (
 	DefaultGuardianAddr  = "http://127.0.0.1:8085"
 	DefaultObserverAddr  = "http://127.0.0.1:8086"
 	DefaultSentinelAddr  = "http://127.0.0.1:8087"
+	DefaultGateAddr      = "http://127.0.0.1:8088"
 )
