@@ -1,10 +1,12 @@
 // Package descriptor defines the canonical nexus.yaml project descriptor schema.
 // This is the authoritative Go representation of the nexus.yaml contract (ADR-009).
 //
-// Atlas validator, Sentinel, Guardian, and any future service that reads
+// Atlas validator, Sentinel, Guardian, Arbiter, and any future service that reads
 // nexus.yaml must import this package rather than defining their own struct.
 //
 // ADR-016: types only. Parsing logic lives in Atlas internal/validator.
+// CW-7-fix: "governance" and "tool" added — previously existed only in Atlas
+// validator.ValidTypes, violating ADR-016 (Canon is the single source of truth).
 package descriptor
 
 // Descriptor is the canonical Go representation of nexus.yaml.
@@ -29,7 +31,10 @@ type Runtime struct {
 }
 
 // ValidTypes is the set of allowed project type values (ADR-009).
-// All services that validate nexus.yaml must use this set.
+// All services that validate nexus.yaml must use this set — never define locally.
+//
+// CW-7-fix: "governance" and "tool" added (were missing from Canon, present in Atlas).
+// Arbiter rule A-C-004 enforces that no service redefines these locally.
 var ValidTypes = map[string]bool{
 	"platform-daemon": true,
 	"web-api":         true,
@@ -41,9 +46,12 @@ var ValidTypes = map[string]bool{
 	"library":         true,
 	"automation":      true,
 	"ml-service":      true,
+	"governance":      true, // CW-7-fix: was defined only in Atlas validator — moved to Canon
+	"tool":            true, // CW-7-fix: was defined only in Atlas validator — moved to Canon
 }
 
 // StatusVerified and StatusUnverified are the canonical project status values.
+// Import these constants — never hardcode "verified" or "unverified" as literals.
 const (
 	StatusVerified   = "verified"
 	StatusUnverified = "unverified"
