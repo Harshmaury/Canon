@@ -62,3 +62,28 @@ const (
 
 // ComponentEngx identifies the engx CLI as the event source.
 const ComponentEngx ComponentType = "engx"
+
+// ── Workspace topics ──────────────────────────────────────────────────────────
+// ADR-002: published by Nexus internal/watcher, consumed by Atlas and Forge.
+// Migrated from nexus/pkg/events/topics.go — import from Canon only.
+// Never redefine these strings locally in any service.
+
+// TopicType is the type for all platform event bus topic names.
+type TopicType = string
+
+const (
+	// TopicWorkspaceFileCreated is published when a new file appears in the workspace.
+	TopicWorkspaceFileCreated TopicType = "workspace.file.created"
+
+	// TopicWorkspaceFileModified is published when an existing workspace file is written.
+	TopicWorkspaceFileModified TopicType = "workspace.file.modified"
+
+	// TopicWorkspaceFileDeleted is published when a workspace file is removed or renamed.
+	TopicWorkspaceFileDeleted TopicType = "workspace.file.deleted"
+
+	// TopicWorkspaceUpdated is published after a batch of file events settles (debounce).
+	TopicWorkspaceUpdated TopicType = "workspace.updated"
+
+	// TopicWorkspaceProjectDetected is published when the watcher finds a new project manifest.
+	TopicWorkspaceProjectDetected TopicType = "workspace.project.detected"
+)
