@@ -1,80 +1,49 @@
+// @canon-project: canon
+// @canon-path: SERVICE-CONTRACT.md
 # SERVICE-CONTRACT.md — Canon
+# @version: 1.0.1
+# @updated: 2026-03-25
 
-**Service:** canon
-**Domain:** Library (shared types)
-**Port:** none
-**ADRs:** ADR-016 (platform shared types)
-**Version:** 0.1.0
-**Module:** github.com/Harshmaury/Canon
-**Updated:** 2026-03-18
+**Type:** Library · **Module:** `github.com/Harshmaury/Canon` · **Domain:** Shared protocol
 
 ---
 
-## Role
+## Code
 
-Canonical types and constants module. Provides the single authoritative
-definition of platform-wide types, header constants, service names, and
-the nexus.yaml descriptor schema. Types and constants only — no logic,
-no HTTP clients, no external dependencies.
-
----
-
-## Packages
-
-| Package              | Contents |
-|----------------------|----------|
-| `canon/events`       | `EventType`, `ComponentType`, `OutcomeType` constants |
-| `canon/identity`     | `TraceIDHeader`, `ServiceTokenHeader`, service names, default addresses |
-| `canon/descriptor`   | `Descriptor` struct, `ValidTypes` map, `StatusVerified`/`Unverified` |
-
----
-
-## Key constants
-
-```go
-// identity
-identity.TraceIDHeader      = "X-Trace-ID"
-identity.ServiceTokenHeader = "X-Service-Token"
-identity.DefaultNexusAddr   = "http://127.0.0.1:8080"
-// ... through identity.DefaultSentinelAddr = "http://127.0.0.1:8087"
-
-// events
-events.EventServiceStarted / Stopped / Crashed / Healed
-events.ComponentNexus / Atlas / Forge / Metrics / Navigator / Guardian / Observer / Sentinel
-events.OutcomeSuccess / Failure / Deferred / Info
-
-// descriptor
-descriptor.StatusVerified / StatusUnverified
-descriptor.ValidTypes  // "platform-daemon","web-api","worker","cli",...
+```
+identity/identity.go    HTTP header constants, service names, default addresses, relay constants
+events/events.go        EventType, ComponentType, OutcomeType, TopicType constants
+events/payloads.go      WorkspaceFilePayload, WorkspaceUpdatedPayload, WorkspaceProjectPayload, SystemAlertPayload
+descriptor/descriptor.go  Descriptor struct, ValidTypes map, StatusVerified/Unverified
 ```
 
 ---
 
-## Dependencies
+## Contract
 
-None. Canon has no external dependencies beyond the Go standard library.
+No HTTP surface. Compile-time only.
+
+**`identity` package — key constants:**
+```
+TraceIDHeader       = "X-Trace-ID"
+ServiceTokenHeader  = "X-Service-Token"
+IdentityTokenHeader = "X-Identity-Token"
+RelayTokenHeader    = "X-Relay-Token"
+DefaultNexusAddr    = "http://127.0.0.1:8080"   (through DefaultGateAddr :8088)
+```
+
+**`descriptor.ValidTypes`:** `platform-daemon`, `web-api`, `worker`, `cli`, `database`, `message-broker`, `gateway`, `library`, `automation`, `ml-service`, `governance`, `tool`.
+
+**Versioning:** any additive constant → patch. Any rename or removal → major, requires ADR-016 amendment.
 
 ---
 
-## Guarantees
+## Control
 
-- Types and constants only — no logic, no side effects, no init() functions.
-- Import Canon — never redefine these constants locally in any service.
-- Changes to Canon require ADR-016 amendment.
-- Canon is imported as v0.3.0 in all service go.mod files.
+No runtime behavior. Compile-time constants and types. No `init()` functions, no side effects.
 
-## Non-Responsibilities
+---
 
-- Canon does not make HTTP calls.
-- Canon does not connect to any platform service.
-- Canon does not parse nexus.yaml — that is Atlas's responsibility
-  (`internal/validator/nexus_yaml.go`). Canon only defines the `Descriptor` type.
-- Canon does not implement any business logic.
+## Context
 
-## Data Authority
-
-None. Canon is a type definition library, not a data store.
-
-## Concurrency Model
-
-Not applicable. Compile-time constants and types — no runtime state.
+Single source of truth for all protocol constants on the platform. Arbiter A-C-001/002 blocks any service that redefines these locally. No external dependencies beyond Go stdlib.
